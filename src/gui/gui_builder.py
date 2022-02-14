@@ -54,7 +54,7 @@ def build_interface(agent: BaseTrainingAgent):
         # Because I did not want to reload the agent every time a change happened
         # Hot reload can be controlled when needed
         agent.agent_is_reloadable = interface.game_info[ControlVariables.hot_reload].get() == 1
-        agent.agent_is_example_mode = interface.game_info[ControlVariables.psyonix_bot].get() == 0
+        agent.agent_is_driving_example = interface.game_info[ControlVariables.psyonix_bot].get() == 0
 
         top.after(500, loop_check)
 

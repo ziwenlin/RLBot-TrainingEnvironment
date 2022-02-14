@@ -5,7 +5,7 @@ from rlbot.utils.structures.game_data_struct import GameTickPacket
 from exercise.training_main import TrainingManager
 from minds.example_bot import example_controller
 from util.agent_base import BaseTrainingAgent
-from util.thread_base import start_interface, stop_interface
+from util.thread_agent import ThreadManagerAgent
 from util.remove.vec import Vec3
 
 ALIVE_INTERVAL = (2 * 60 * 30)
@@ -27,17 +27,19 @@ class BaseTrainingEnvironmentAgent(BaseAgent, BaseTrainingAgent):
      """
 
     def __init__(self, name, team, index):
-        super().__init__(name, team, index)
+        BaseAgent.__init__(self, name, team, index)
+        BaseTrainingAgent.__init__(self)
         # self.tps_graph = Graph1D((50, 50, 300, 300))
 
     def update_environment(self, packet: GameTickPacket):
         if self.lifetime > 6000:
             pass  # Don't waste compute power on all if-statements
-        elif not self.interface_thread and self.lifetime == 30:
+        elif self.thread_manager is not ThreadManagerAgent and self.lifetime == 30:
             """After a set time the interface get initiated. It should 
             execute at 30th tick in the game."""
             self.training = TrainingManager(self)
-            self.interface_thread = start_interface(self)
+            self.thread_manager = ThreadManagerAgent(self)
+            self.thread_manager.start()
         elif self.lifetime == 120:
             """After 4 seconds (if fps is set at 30 otherwise after 1 second) 
             This function is only for 1 time execution after start"""
@@ -69,7 +71,7 @@ class BaseTrainingEnvironmentAgent(BaseAgent, BaseTrainingAgent):
         """The update controller checks whether the agent should drive,
         playing dumb or standing still"""
         if self.agent_is_driving:
-            if self.agent_is_example_mode:
+            if self.agent_is_driving_example:
                 # Agent should be driving and be controlled
                 controls = self.run_agent(packet)
                 if not controls: # Handling a possible None
@@ -98,7 +100,7 @@ class BaseTrainingEnvironmentAgent(BaseAgent, BaseTrainingAgent):
 
     def retire(self):
         self.training.stop_training()
-        stop_interface(self)
+        self.thread_manager.stop()
 
     def is_hot_reload_enabled(self):
         return self.agent_is_reloadable
