@@ -4,28 +4,14 @@ from typing import List
 
 from util.agent_base import BaseTrainingAgent
 from util.thread_base import BaseThreadManager
-from util.thread_interface import InterfaceThread
+from util.thread_interface import InterfaceMainThread
 
 
 class ThreadManagerAgent(BaseThreadManager):
     def __init__(self, agent, *args):
         super().__init__(*args)
-        runner_event = threading.Event()
-        self.threads: List[threading.Thread] = []
-        self.running_event = runner_event
-
-        thread = InterfaceThread(agent, runner_event)
-        self.threads += [thread]
-        # thread = InterfaceClosingThread(root, runner_event)
-        # self.threads += [thread]
-
-    def start(self):
-        self.running_event.set()
-        for thread in self.threads:
-            thread.start()
-
-    def stop(self):
-        self.running_event.clear()
+        runner_event = self.running_event
+        self.add_thread(InterfaceMainThread(agent, runner_event))
 
 
 class DQNManagerThread(threading.Thread):

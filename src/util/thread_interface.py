@@ -7,7 +7,7 @@ from gui.gui_builder import build_interface
 from util.agent_base import BaseTrainingAgent
 
 
-class InterfaceThread(threading.Thread):
+class InterfaceMainThread(threading.Thread):
     def __init__(self, agent, running_event):
         super().__init__(daemon=True)
         self.running_flag: threading.Event = running_event
@@ -28,8 +28,8 @@ class InterfaceThread(threading.Thread):
             print('Exception RuntimeError found')
             # from traceback import print_exc
             # print_exc()
-        while running.is_set(): # This thread needs to be alive
-            sleep(0.01) # in order to keep the game from crashing
+        while running.is_set():  # This thread needs to be alive
+            sleep(0.01)  # in order to keep the game from crashing
 
 
 class InterfaceClosingThread(threading.Thread):

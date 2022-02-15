@@ -71,9 +71,8 @@ def make_spinbox_bindings(root: tk.Tk, interface: InterfaceVariables, spinbox_co
     def loop():
         for binder in function_list:
             binder()
-        root.after(50, loop)
 
-    root.after(1000, loop)
+    interface.thread.add_task(loop)
 
 
 def make_spinbox_updater(interface: InterfaceVariables, spinbox_collection_vars: PhysicVariables,
@@ -136,7 +135,6 @@ def make_relative_spinbox_bindings(root: tk.Tk, interface: InterfaceVariables, s
         for binder in function_list:
             binder()
         setup()
-        root.after(50, loop)
 
     def setup():
         if interface.selector.get(id1) is None:  # If no item is selected yet
@@ -150,7 +148,7 @@ def make_relative_spinbox_bindings(root: tk.Tk, interface: InterfaceVariables, s
         physics = interface.selector[id3].get_normal()
         interface.selector[id2].update(physics)
 
-    root.after(1000, loop)
+    interface.thread.add_task(loop)
 
 
 def make_relative_spinbox_updater(interface: InterfaceVariables, spinbox_collection_vars: PhysicVariables,
@@ -171,7 +169,6 @@ def make_relative_spinbox_updater(interface: InterfaceVariables, spinbox_collect
             interface.selector[id3].calculate()
         else:
             interface.selector[id3].refresh(interface.selector.get(id1), interface.selector.get(id2))
-
 
     updater_list = _function_list_spinbox(_physics_spinbox_updater, interface, spinbox_collection_vars, id3)
 

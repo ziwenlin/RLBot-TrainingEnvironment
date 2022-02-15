@@ -20,10 +20,9 @@ def make_combobox(root, agent: BaseTrainingAgent, interface: InterfaceVariables,
     def update():
         combobox_update_values()
         combobox_update_select_items()
-        combobox.after(500, update)
 
     combobox.set('None')
-    combobox.after(1000, update)
+    interface.thread.add_task(update)
 
 
 def _make_combobox_select_update(combobox: ttk.Combobox, agent: BaseTrainingAgent, interface: InterfaceVariables,

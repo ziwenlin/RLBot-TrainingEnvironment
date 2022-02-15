@@ -103,21 +103,6 @@ def panel_display(base, agent, interface: InterfaceVariables):
         item_location.set('y', y)
         interface.update()
 
-    def draw():
-        for item in canvas_items:
-            item.update()
-        cursor.bind = interface.selector.get(PHYSICS_PANEL_PRIMARY)
-        cursor.visibility(cursor.bind is not None)
-        cursor_relative.bind = interface.selector.get(PHYSICS_PANEL_SECONDARY)
-        cursor_relative.visibility(cursor_relative.bind is not None)
-        canvas.after(50, draw)
-
-    def update():
-        check_changes_cars(canvas, agent, canvas_items)
-        check_changes_items(canvas, agent, canvas_items)
-        # update_velocity_canvas(canvas, agent)
-        canvas.after(1000, update)
-
     canvas.bind('<Button-1>', select_item)
     canvas.bind('<B1-Motion>', drag_drop)
     canvas.bind('<Button-3>', drag_rotate)
@@ -130,6 +115,30 @@ def panel_display(base, agent, interface: InterfaceVariables):
     canvas.bind('<KeyPress-x>', set_target)
     canvas.bind('<Enter>', lambda e: canvas.focus_set())
     # canvas.bind('<Key>', print)
-    canvas.after(50, update)
-    canvas.after(50, draw)
+
+    update = build_task_update(interface, agent, canvas, canvas_items)
+    draw = build_task_draw(interface, cursor, cursor_relative, canvas_items)
+    interface.thread.add_task(update)
+    interface.thread.add_task(draw)
     canvas.pack()
+
+
+def build_task_draw(interface, cursor, cursor_relative, canvas_items):
+    def draw():
+        for item in canvas_items:
+            item.update()
+        cursor.bind = interface.selector.get(PHYSICS_PANEL_PRIMARY)
+        cursor.visibility(cursor.bind is not None)
+        cursor_relative.bind = interface.selector.get(PHYSICS_PANEL_SECONDARY)
+        cursor_relative.visibility(cursor_relative.bind is not None)
+
+    return draw
+
+
+def build_task_update(interface, agent, canvas, canvas_items):
+    def update():
+        check_changes_cars(canvas, agent, canvas_items)
+        check_changes_items(canvas, agent, canvas_items)
+        # update_velocity_canvas(canvas, agent)
+
+    return update

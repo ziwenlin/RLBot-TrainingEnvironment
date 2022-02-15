@@ -11,6 +11,20 @@ from gui.gamestate_functions import game_state_error_correction, game_state_rend
 
 
 def build_interface(agent: BaseTrainingAgent):
+    top, interface = build_interface_base(agent)
+
+    loop_snapshot = build_task_snapshot_loop(top, agent, interface)
+    loop_check = build_task_check(top, agent, interface)
+
+    interface.thread.add_task(loop_snapshot)
+    interface.thread.add_task(loop_check)
+    interface.thread.start()
+    # top.after(500, loop_snapshot)
+    # top.after(500, loop_check)
+    return top
+
+
+def build_interface_base(agent: BaseTrainingAgent):
     top = tk.Tk()
     interface = InterfaceVariables()
     interface.agent = agent
@@ -21,6 +35,11 @@ def build_interface(agent: BaseTrainingAgent):
     panel_controls(top, agent, interface)
     panel_training(top, agent, interface)
 
+    top.data = interface
+    return top, interface
+
+
+def build_task_snapshot_loop(root, agent, interface):
     def loop_snapshot():
         # Tkinter main loop. Check for errors and correct them at the start
         game_state_error_correction(agent, interface)
@@ -36,8 +55,8 @@ def build_interface(agent: BaseTrainingAgent):
                 game_state_push_snapshot(agent, interface)
             interface.update()
         # elif interface.info(ControlVariables.freeze):
-            # game_state_update_snapshot(agent, interface)
-            # interface.update()
+        # game_state_update_snapshot(agent, interface)
+        # interface.update()
         elif interface.info(ControlVariables.live):
             agent.snapshot_live_flag = True
             # game_state_update_snapshot(agent, interface)
@@ -46,22 +65,20 @@ def build_interface(agent: BaseTrainingAgent):
         elif interface.info(ControlVariables.preview):
             game_state_render_snapshot(agent, interface)
             interface.update()
+        # root.after(50, loop_snapshot)
+
+    return loop_snapshot
 
 
-        top.after(50, loop_snapshot)
-
+def build_task_check(root, agent, interface):
     def loop_check():
         # Because I did not want to reload the agent every time a change happened
         # Hot reload can be controlled when needed
         agent.agent_is_reloadable = interface.game_info[ControlVariables.hot_reload].get() == 1
         agent.agent_is_driving_example = interface.game_info[ControlVariables.psyonix_bot].get() == 0
+        # root.after(500, loop_check)
 
-        top.after(500, loop_check)
-
-    top.after(500, loop_snapshot)
-    top.after(500, loop_check)
-    top.data = interface
-    return top
+    return loop_check
 
 
 def build_interface_standalone(agent: BaseTrainingAgent):
@@ -75,5 +92,3 @@ def build_interface_standalone(agent: BaseTrainingAgent):
     # data_vars = top.data_vars
     # panel_load(top, data_vars)
     return top
-
-

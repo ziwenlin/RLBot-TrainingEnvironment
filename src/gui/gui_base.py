@@ -4,6 +4,7 @@ from typing import Dict, Union, Callable
 from snapshot.snapshot_base import SnapshotPhysics
 from util.agent_base import BaseTrainingAgent
 from util.bin.relative_physics import RelativePhysics
+from util.thread_base import BaseThreadManager
 
 PhysicVariables = Dict[str, Dict[str, tk.StringVar]]
 CarDataVariables = Dict[str, Union[tk.DoubleVar, tk.IntVar]]
@@ -23,6 +24,7 @@ class InterfaceVariables:
     selector_updater: SelectorUpdater = {}
 
     agent: BaseTrainingAgent = None
+    thread = BaseThreadManager()
 
     def update(self):
         for updater in self.selector_updater.values():
