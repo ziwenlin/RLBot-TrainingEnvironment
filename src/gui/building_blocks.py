@@ -1,15 +1,15 @@
 import tkinter as tk
 
 
-def make_check_button(root, data_vars, text):
-    data_vars[text] = check_var = tk.IntVar(root, value=0)
-    check_button = tk.Checkbutton(root, text=text, variable=check_var)
+def make_check_button(root, data_vars: dict, name):
+    data_vars[name] = check_var = tk.IntVar(root, value=0)
+    check_button = tk.Checkbutton(root, text=name, variable=check_var)
     check_button.pack(anchor='w')
 
 
-def make_slider(root, data_vars, text):
-    make_spaced_label(root, text)
-    data_vars[text] = scale_var = tk.DoubleVar(root, value=0)
+def make_slider(root, data_vars: dict, name):
+    make_spaced_label(root, name)
+    data_vars[name] = scale_var = tk.StringVar(root, value=0)
     scale = tk.Scale(root, variable=scale_var, orient=tk.HORIZONTAL)
     scale.bind('<MouseWheel>', _make_scrolling_event(scale_var, -1))
     scale.pack(fill=tk.BOTH)
@@ -21,8 +21,8 @@ def make_spaced_label(root, text):
     label.pack(fill=tk.BOTH)
 
 
-def make_labeled_entry(root, text):
-    make_spaced_label(root, text)
+def make_labeled_entry(root, name):
+    make_spaced_label(root, name)
     entry = tk.Entry(root)
     entry.pack(fill=tk.BOTH)
     return entry

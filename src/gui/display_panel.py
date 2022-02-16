@@ -118,8 +118,8 @@ def panel_display(base, agent, interface: InterfaceVariables):
 
     update = build_task_update(interface, agent, canvas, canvas_items)
     draw = build_task_draw(interface, cursor, cursor_relative, canvas_items)
-    interface.thread.add_task(update)
-    interface.thread.add_task(draw)
+    interface.thread.add_task(update, 10)
+    interface.thread.add_task(draw, 50)
     canvas.pack()
 
 

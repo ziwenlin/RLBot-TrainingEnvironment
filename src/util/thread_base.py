@@ -21,22 +21,24 @@ class BaseThreadManager:
             thread.start()
         self.threads.append(thread)
 
-    def add_task(self, task):
-        thread = BaseHelperThread(task, self.running_event)
+    def add_task(self, task, freq=100):
+        thread = BaseHelperThread(task, self.running_event, freq)
         if self.running_event.is_set():
             thread.start()
         self.threads.append(thread)
 
 
 class BaseHelperThread(threading.Thread):
-    def __init__(self, task, running_event):
+    def __init__(self, task, running_event, freq):
         super().__init__(daemon=True)
         self.running_flag: threading.Event = running_event
         self.task = task
+        self.sleep = 1/freq
 
     def run(self):
         running = self.running_flag
+        interval = self.sleep
 
         while running.is_set():
             self.task()
-            sleep(0.01)
+            sleep(interval)

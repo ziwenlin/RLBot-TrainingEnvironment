@@ -47,6 +47,15 @@ def panel_primairy_selector(base, agent: BaseTrainingAgent, interface: Interface
     # for check_name in ['Jumped', 'Double Jumped']:
     #     make_check_button(frame, data_vars.car_data, check_name)
 
+    # TODO make a building base for debugging in tkinter
+    make_spacer(frame, 10)
+    make_slider(frame, interface.game_info, 'Debug a')
+    make_slider(frame, interface.game_info, 'Debug b')
+    # debug_text = tk.StringVar(frame, value='Nothing yet')
+    # interface.game_info[ControlVariables.debug] = debug_text
+    # debug_label = tk.Scale(frame, variable=debug_text, anchor='w', padx=5)
+    # debug_label.pack(fill=tk.BOTH)
+
 
 def panel_secondary_selector(base, agent: BaseTrainingAgent, interface: InterfaceVariables):
     """Mid panel
@@ -73,12 +82,6 @@ def panel_controls(base, agent: BaseTrainingAgent, data_vars: InterfaceVariables
     for slider_name in CONTROL_SLIDERS:
         make_spacer(frame, 10)
         make_slider(frame, data_vars.game_info, slider_name)
-
-    # TODO make a building base for debugging in tkinter
-    make_spacer(frame, 10)
-    data_vars.game_info[ControlVariables.debug] = debug_text = tk.StringVar(frame, value='Nothing yet')
-    debug_label = tk.Label(frame, textvariable=debug_text, anchor='w', padx=5)
-    debug_label.pack(fill=tk.BOTH)
 
 
 def panel_training(base, agent: BaseTrainingAgent, data_vars: InterfaceVariables):

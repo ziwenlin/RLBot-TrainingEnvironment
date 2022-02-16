@@ -72,7 +72,7 @@ def make_spinbox_bindings(root: tk.Tk, interface: InterfaceVariables, spinbox_co
         for binder in function_list:
             binder()
 
-    interface.thread.add_task(loop)
+    interface.thread.add_task(loop, 10)
 
 
 def make_spinbox_updater(interface: InterfaceVariables, spinbox_collection_vars: PhysicVariables,
@@ -148,7 +148,7 @@ def make_relative_spinbox_bindings(root: tk.Tk, interface: InterfaceVariables, s
         physics = interface.selector[id3].get_normal()
         interface.selector[id2].update(physics)
 
-    interface.thread.add_task(loop)
+    interface.thread.add_task(loop, 10)
 
 
 def make_relative_spinbox_updater(interface: InterfaceVariables, spinbox_collection_vars: PhysicVariables,

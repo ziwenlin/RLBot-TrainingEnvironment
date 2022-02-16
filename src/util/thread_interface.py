@@ -29,7 +29,7 @@ class InterfaceMainThread(threading.Thread):
             # from traceback import print_exc
             # print_exc()
         while running.is_set():  # This thread needs to be alive
-            sleep(0.01)  # in order to keep the game from crashing
+            sleep(0.1)  # in order to keep the game from crashing
 
 
 class InterfaceClosingThread(threading.Thread):
@@ -43,5 +43,7 @@ class InterfaceClosingThread(threading.Thread):
         root = self.root
 
         while running.is_set():
-            sleep(0.01)
+            sleep(0.1)
+        root.event_generate('<<close>>')
+        sleep(0.5)
         root.destroy()

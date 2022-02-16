@@ -22,8 +22,8 @@ def game_state_fetch_snapshot(agent: BaseTrainingAgent, interface: InterfaceVari
     # game_state: StructSnapshot.game_state = convert_game_state_to_snapshot(agent.game_state)
     agent.snapshot.update(agent.game_state)  # Save the taken snapshot
     agent.snapshot.update_items(agent.game_items)
-    interface.game_info['Debug'].set(f'{agent.agent_controller.steer: .2f}\n'
-                                     f'{agent.agent_controller.throttle: .2f}')
+    interface.game_info['Debug a'].set(f'{agent.agent_controller.steer * 50 + 50: .2f}')
+    interface.game_info['Debug b'].set(f'{agent.agent_controller.throttle * 50 + 50: .2f}')
     interface.update()
 
 

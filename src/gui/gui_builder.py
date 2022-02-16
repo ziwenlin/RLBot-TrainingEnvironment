@@ -16,11 +16,18 @@ def build_interface(agent: BaseTrainingAgent):
     loop_snapshot = build_task_snapshot_loop(top, agent, interface)
     loop_check = build_task_check(top, agent, interface)
 
-    interface.thread.add_task(loop_snapshot)
-    interface.thread.add_task(loop_check)
+    interface.thread.add_task(loop_snapshot, 60)
+    interface.thread.add_task(loop_check, 3)
     interface.thread.start()
-    # top.after(500, loop_snapshot)
-    # top.after(500, loop_check)
+
+    def close(event=None):
+        interface.thread.stop()
+        top.after(100, top.destroy)
+
+    top.wm_protocol('WM_DELETE_WINDOW', close)
+    top.event_add('<<close>>', 'WM_DELETE_WINDOW')
+    top.bind('<<close>>', close)
+    # top.after(2000, lambda: top.event_generate('<<close>>'))
     return top
 
 
@@ -83,6 +90,7 @@ def build_task_check(root, agent, interface):
 
 def build_interface_standalone(agent: BaseTrainingAgent):
     # Filling the missing data when running the program without Rocket League
+    agent.game_state.ball.physics.location.y = 1000
     agent.snapshot.update(agent.game_state)
     agent.game_packet = GameTickPacket()
     agent.game_packet.num_cars = 5
