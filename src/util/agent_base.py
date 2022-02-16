@@ -61,9 +61,7 @@ class BaseTrainingAgent:
         self.thread_manager: BaseThreadManager = BaseThreadManager()
         """Object used to create the interface.
         """
-        # self.interface_running = threading.Event()
-        # """Object used to stop the interface.
-        # """
+
         self.index: int = 0
 
     def restore_agent(self):

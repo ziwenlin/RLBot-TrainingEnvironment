@@ -1,7 +1,7 @@
 import math
 from typing import List
 
-from gui.display_converter import convert_game_location_to_coord, convert_coord_to_c_coord, \
+from gui.display_convert import convert_game_location_to_coord, convert_coord_to_c_coord, \
     convert_location_to_coord, convert_game_velocity_to_coord
 from snapshot.snapshot_structs import StructGameState, StructCar
 

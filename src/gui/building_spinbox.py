@@ -53,20 +53,20 @@ def make_named_spinbox(root, name: str):
     return spinbox_var
 
 
-def _function_list_spinbox(function, interface: InterfaceVariables, spinbox_collection_vars: PhysicVariables,
-                           selected: str):
-    function_list = []
+def build_spinbox_task_list(task, interface: InterfaceVariables, spinbox_collection_vars: PhysicVariables,
+                            selected: str):
+    task_list = []
     for vector, spinbox_group_vars in spinbox_collection_vars.items():
         for axis, spinbox_var in spinbox_group_vars.items():
-            bind = function(interface, spinbox_var, selected, vector, axis)
-            function_list.append(bind)
-    return function_list
+            bind = task(interface, spinbox_var, selected, vector, axis)
+            task_list.append(bind)
+    return task_list
 
 
-def make_spinbox_bindings(root: tk.Tk, interface: InterfaceVariables, spinbox_collection_vars: PhysicVariables,
-                          selected: str):
+def spinbox_bindings(root: tk.Tk, interface: InterfaceVariables, spinbox_collection_vars: PhysicVariables,
+                     selected: str):
     """Takes the physics of an item and bind the physic variables to the spinbox_variables and back"""
-    function_list = _function_list_spinbox(_physics_spinbox_binding, interface, spinbox_collection_vars, selected)
+    function_list = build_spinbox_task_list(build_spinbox_physics_binding, interface, spinbox_collection_vars, selected)
 
     def loop():
         for binder in function_list:
@@ -75,10 +75,10 @@ def make_spinbox_bindings(root: tk.Tk, interface: InterfaceVariables, spinbox_co
     interface.thread.add_task(loop, 10)
 
 
-def make_spinbox_updater(interface: InterfaceVariables, spinbox_collection_vars: PhysicVariables,
-                         selected: str):
+def spinbox_updater(interface: InterfaceVariables, spinbox_collection_vars: PhysicVariables,
+                    selected: str):
     """Takes the physics of an item and bind the physic variables to the spinbox_variables"""
-    updater_list = _function_list_spinbox(_physics_spinbox_updater, interface, spinbox_collection_vars, selected)
+    updater_list = build_spinbox_task_list(build_spinbox_physics_updater, interface, spinbox_collection_vars, selected)
 
     def loop():
         for updater in updater_list:
@@ -87,8 +87,8 @@ def make_spinbox_updater(interface: InterfaceVariables, spinbox_collection_vars:
     interface.selector_updater[selected] = loop
 
 
-def _physics_spinbox_updater(interface: InterfaceVariables, spinbox_var: tk.StringVar, selected: str, vector: str,
-                             axis: str):
+def build_spinbox_physics_updater(interface: InterfaceVariables, spinbox_var: tk.StringVar, selected: str, vector: str,
+                                  axis: str):
     """Creates a compiled function for updating the physic value to the spinbox_variable."""
 
     def spinbox_update():
@@ -100,8 +100,8 @@ def _physics_spinbox_updater(interface: InterfaceVariables, spinbox_var: tk.Stri
     return spinbox_update
 
 
-def _physics_spinbox_binding(interface: InterfaceVariables, spinbox_var: tk.StringVar, selected: str, vector: str,
-                             axis: str):
+def build_spinbox_physics_binding(interface: InterfaceVariables, spinbox_var: tk.StringVar, selected: str, vector: str,
+                                  axis: str):
     """Creates a compiled function for binding spinbox_variable to physics values."""
 
     def spinbox_bind():
@@ -125,11 +125,11 @@ def _physics_spinbox_binding(interface: InterfaceVariables, spinbox_var: tk.Stri
     return spinbox_bind
 
 
-def make_relative_spinbox_bindings(root: tk.Tk, interface: InterfaceVariables, spinbox_collection_vars: PhysicVariables,
-                                   id1, id2, id3: str):
+def spinbox_bindings_relative(root: tk.Tk, interface: InterfaceVariables, spinbox_collection_vars: PhysicVariables,
+                              id1, id2, id3: str):
     """Takes the physics of an item and bind the physic variables to the spinbox_variables and back"""
 
-    function_list = _function_list_spinbox(_physics_spinbox_binding, interface, spinbox_collection_vars, id3)
+    function_list = build_spinbox_task_list(build_spinbox_physics_binding, interface, spinbox_collection_vars, id3)
 
     def loop():
         for binder in function_list:
@@ -151,29 +151,40 @@ def make_relative_spinbox_bindings(root: tk.Tk, interface: InterfaceVariables, s
     interface.thread.add_task(loop, 10)
 
 
-def make_relative_spinbox_updater(interface: InterfaceVariables, spinbox_collection_vars: PhysicVariables,
-                                  id1, id2, id3: str):
+def spinbox_updater_relative(interface: InterfaceVariables, spinbox_collection_vars: PhysicVariables,
+                             id1, id2, id3: str):
     """Takes the physics of an item and bind the physic variables to the spinbox_variables"""
 
-    def setup():
-        if interface.selector.get(id1) is None:  # If no item is selected yet
-            interface.selector[id3] = None
-            return
-        if interface.selector.get(id2) is None:  # If no item is selected yet
-            interface.selector[id3] = None
-            return
-        if interface.selector.get(id3) is None:  # If no item is selected yet
-            interface.selector[id3] = RelativePhysics(interface.selector[id1], interface.selector[id2])
-        elif interface.selector[id3].origin == interface.selector[id1] and \
-                interface.selector[id3].target == interface.selector[id2]:
-            interface.selector[id3].calculate()
+    def check():
+        selector_1 = interface.selector.get(id1)
+        selector_2 = interface.selector.get(id2)
+        selector_3 = interface.selector.get(id3)
+        if selector_1 is None:  # If no item is selected yet
+            return 0
+        if selector_2 is None:  # If no item is selected yet
+            return 0
+        if selector_3 is None:  # If no item is selected yet
+            return 1
+        if selector_3.origin == selector_1 and selector_3.target == selector_2:
+            return 2
         else:
+            return 3
+
+    def process(id):
+        if id == 0:  # If no item is selected yet
+            interface.selector[id3] = None
+        elif id == 1:  # If no item is selected yet
+            interface.selector[id3] = RelativePhysics(interface.selector[id1], interface.selector[id2])
+        elif id == 2:
+            interface.selector[id3].calculate()
+        elif id == 3:
             interface.selector[id3].refresh(interface.selector.get(id1), interface.selector.get(id2))
 
-    updater_list = _function_list_spinbox(_physics_spinbox_updater, interface, spinbox_collection_vars, id3)
+    updater_list = build_spinbox_task_list(build_spinbox_physics_updater, interface, spinbox_collection_vars, id3)
 
     def loop():
-        setup()
+        result = check()
+        process(result)
         for updater in updater_list:
             updater()
 

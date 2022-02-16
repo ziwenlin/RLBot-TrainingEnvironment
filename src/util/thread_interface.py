@@ -45,5 +45,4 @@ class InterfaceClosingThread(threading.Thread):
         while running.is_set():
             sleep(0.1)
         root.event_generate('<<close>>')
-        sleep(0.5)
-        root.destroy()
+

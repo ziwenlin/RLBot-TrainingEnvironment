@@ -11,21 +11,22 @@ def make_combobox(root, agent: BaseTrainingAgent, interface: InterfaceVariables,
     make_spaced_label(root, 'Selected item:')
     combobox = ttk.Combobox(root)
     combobox.pack()
+    combobox.set('None')
 
-    for bindings in ('<<ComboboxSelected>>',):
-        combobox.bind(bindings, _make_combobox_select_event(combobox, agent, interface, selector))
-    combobox_update_values = _make_combobox_values_update(combobox, agent)
-    combobox_update_select_items = _make_combobox_select_update(combobox, agent, interface, selector)
+    combobox_event_select = build_combobox_select_event(combobox, agent, interface, selector)
+    combobox_update_values = build_combobox_values_update(combobox, agent)
+    combobox_update_select_items = build_combobox_select_update(combobox, agent, interface, selector)
 
     def update():
         combobox_update_values()
         combobox_update_select_items()
 
-    combobox.set('None')
+    for bindings in ('<<ComboboxSelected>>',):
+        combobox.bind(bindings, combobox_event_select)
     interface.thread.add_task(update)
 
 
-def _make_combobox_select_update(combobox: ttk.Combobox, agent: BaseTrainingAgent, interface: InterfaceVariables,
+def build_combobox_select_update(combobox: ttk.Combobox, agent: BaseTrainingAgent, interface: InterfaceVariables,
                                  selector):
     def combobox_select_update():
         physics = interface.selector.get(selector)
@@ -46,7 +47,7 @@ def _make_combobox_select_update(combobox: ttk.Combobox, agent: BaseTrainingAgen
     return combobox_select_update
 
 
-def _make_combobox_values_update(combobox: ttk.Combobox, agent: BaseTrainingAgent):
+def build_combobox_values_update(combobox: ttk.Combobox, agent: BaseTrainingAgent):
     def combobox_update_values():
         values = ['None', 'Ball']
         for i in agent.snapshot.cars:
@@ -58,7 +59,7 @@ def _make_combobox_values_update(combobox: ttk.Combobox, agent: BaseTrainingAgen
     return combobox_update_values
 
 
-def _make_combobox_select_event(combobox: ttk.Combobox, agent: BaseTrainingAgent, interface: InterfaceVariables,
+def build_combobox_select_event(combobox: ttk.Combobox, agent: BaseTrainingAgent, interface: InterfaceVariables,
                                 selector):
     def combobox_select_item(event):
         selected_item: str = combobox.get()

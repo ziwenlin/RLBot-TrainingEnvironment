@@ -1,6 +1,6 @@
 import tkinter as tk
 
-from gui.display_converter import convert_coord_to_c_coord, convert_game_location_to_coord, \
+from gui.display_convert import convert_coord_to_c_coord, convert_game_location_to_coord, \
     convert_game_rotation_to_coord, orient_shape
 
 CAR_NAMES = [

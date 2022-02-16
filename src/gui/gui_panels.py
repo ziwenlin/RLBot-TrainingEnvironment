@@ -2,13 +2,13 @@ import tkinter as tk
 
 from gui.building_blocks import make_check_button, make_slider, make_button, make_base_frame, make_spacer, \
     make_labeled_entry, make_spaced_label
-from gui.building_spinbox import make_panel_physics, make_spinbox_bindings, make_spinbox_updater, \
-    make_relative_spinbox_updater, make_relative_spinbox_bindings
+from gui.building_spinbox import make_panel_physics, spinbox_bindings, spinbox_updater, \
+    spinbox_updater_relative, spinbox_bindings_relative
 from gui.display_panel import panel_display
 from gui.gui_base import InterfaceVariables, CONTROL_CHECKBOXES, CONTROL_SLIDERS, ControlVariables, \
     PHYSICS_PANEL_PRIMARY, PHYSICS_PANEL_SECONDARY, PHYSICS_PANEL_SECONDARY_RELATIVE
 from gui.building_combobox import make_combobox
-from gui.gamestate_functions import game_state_fetch_snapshot, game_state_push_snapshot
+from gui.gui_snapshot import game_state_fetch_snapshot, game_state_push_snapshot
 from snapshot.file_functions import save_snapshot, load_snapshot
 from util.agent_base import BaseTrainingAgent
 from util.bin.relative_physics import RelativePhysics
@@ -21,12 +21,12 @@ def panel_main_overview(base, agent: BaseTrainingAgent, interface: InterfaceVari
     frame = make_base_frame(base)
     panel_display(frame, agent, interface)
 
-    label = tk.Label(frame, text='Ball')
-    label.pack()
-    interface.selector_vars['Ball'] = make_panel_physics(frame, side=tk.LEFT)
-    interface.selector['Ball'] = agent.snapshot.ball.physics
-    make_spinbox_bindings(frame, interface, interface.selector_vars['Ball'], 'Ball')
-    make_spinbox_updater(interface, interface.selector_vars['Ball'], 'Ball')
+    # label = tk.Label(frame, text='Ball')
+    # label.pack()
+    # interface.selector_vars['Ball'] = make_panel_physics(frame, side=tk.LEFT)
+    # interface.selector['Ball'] = agent.snapshot.ball.physics
+    # spinbox_bindings(frame, interface, interface.selector_vars['Ball'], 'Ball')
+    # spinbox_updater(interface, interface.selector_vars['Ball'], 'Ball')
 
 
 def panel_primairy_selector(base, agent: BaseTrainingAgent, interface: InterfaceVariables):
@@ -36,8 +36,8 @@ def panel_primairy_selector(base, agent: BaseTrainingAgent, interface: Interface
     identifier = PHYSICS_PANEL_PRIMARY
     make_combobox(frame, agent, interface, identifier)
     interface.selector_vars[identifier] = make_panel_physics(frame, side=tk.TOP)
-    make_spinbox_bindings(frame, interface, interface.selector_vars[identifier], identifier)
-    make_spinbox_updater(interface, interface.selector_vars[identifier], identifier)
+    spinbox_bindings(frame, interface, interface.selector_vars[identifier], identifier)
+    spinbox_updater(interface, interface.selector_vars[identifier], identifier)
 
     make_spacer(frame, 10)
     make_slider(frame, interface.car_data, 'Boost')
@@ -46,15 +46,6 @@ def panel_primairy_selector(base, agent: BaseTrainingAgent, interface: Interface
     # make_spacer(frame, 10)
     # for check_name in ['Jumped', 'Double Jumped']:
     #     make_check_button(frame, data_vars.car_data, check_name)
-
-    # TODO make a building base for debugging in tkinter
-    make_spacer(frame, 10)
-    make_slider(frame, interface.game_info, 'Debug a')
-    make_slider(frame, interface.game_info, 'Debug b')
-    # debug_text = tk.StringVar(frame, value='Nothing yet')
-    # interface.game_info[ControlVariables.debug] = debug_text
-    # debug_label = tk.Scale(frame, variable=debug_text, anchor='w', padx=5)
-    # debug_label.pack(fill=tk.BOTH)
 
 
 def panel_secondary_selector(base, agent: BaseTrainingAgent, interface: InterfaceVariables):
@@ -65,23 +56,32 @@ def panel_secondary_selector(base, agent: BaseTrainingAgent, interface: Interfac
     identifier_relative = PHYSICS_PANEL_SECONDARY_RELATIVE
     make_combobox(frame, agent, interface, identifier)
     interface.selector_vars[identifier] = make_panel_physics(frame, side=tk.TOP)
-    make_relative_spinbox_bindings(frame, interface, interface.selector_vars[identifier],
-                                  PHYSICS_PANEL_PRIMARY, identifier, identifier_relative)
-    make_relative_spinbox_updater(interface, interface.selector_vars[identifier],
-                                  PHYSICS_PANEL_PRIMARY, identifier, identifier_relative)
+    spinbox_bindings_relative(frame, interface, interface.selector_vars[identifier],
+                              PHYSICS_PANEL_PRIMARY, identifier, identifier_relative)
+    spinbox_updater_relative(interface, interface.selector_vars[identifier],
+                             PHYSICS_PANEL_PRIMARY, identifier, identifier_relative)
 
 
-def panel_controls(base, agent: BaseTrainingAgent, data_vars: InterfaceVariables):
+def panel_controls(base, agent: BaseTrainingAgent, interface: InterfaceVariables):
     """Right panel"""
     frame = make_base_frame(base)
     make_spaced_label(frame, 'Control panel')
 
     for check_name in CONTROL_CHECKBOXES:
-        make_check_button(frame, data_vars.game_info, check_name)
+        make_check_button(frame, interface.game_info, check_name)
 
     for slider_name in CONTROL_SLIDERS:
         make_spacer(frame, 10)
-        make_slider(frame, data_vars.game_info, slider_name)
+        make_slider(frame, interface.game_info, slider_name)
+
+    # TODO make a building base for debugging in tkinter
+    make_spacer(frame, 10)
+    make_slider(frame, interface.game_info, 'Debug a')
+    make_slider(frame, interface.game_info, 'Debug b')
+    # debug_text = tk.StringVar(frame, value='Nothing yet')
+    # interface.game_info[ControlVariables.debug] = debug_text
+    # debug_label = tk.Scale(frame, variable=debug_text, anchor='w', padx=5)
+    # debug_label.pack(fill=tk.BOTH)
 
 
 def panel_training(base, agent: BaseTrainingAgent, data_vars: InterfaceVariables):

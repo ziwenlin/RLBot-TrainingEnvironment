@@ -14,6 +14,7 @@ def game_state_error_correction(agent: BaseTrainingAgent, data_vars: InterfaceVa
 # TODO why is this less glitchy and what does it do, I forgot...?
 def game_state_render_snapshot(agent: BaseTrainingAgent, data_vars):
     """Calls the render function to show the positions live in game
+    This only draws some marks on the map, good for debugging
     This is less glitch-y than the other function"""
 
 
@@ -27,7 +28,7 @@ def game_state_fetch_snapshot(agent: BaseTrainingAgent, interface: InterfaceVari
     interface.update()
 
 
-def game_state_push_snapshot(agent: BaseTrainingAgent, data_vars: InterfaceVariables):
+def game_state_push_snapshot(agent: BaseTrainingAgent, interface: InterfaceVariables):
     """Pushing snapshot so that the game state is overridden.
      The base agent manager will setup the cars and ball into their positions."""
     agent.snapshot_override_flag = True

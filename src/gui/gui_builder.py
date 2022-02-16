@@ -6,8 +6,23 @@ from gui.gui_base import InterfaceVariables, ControlVariables
 from gui.gui_panels import panel_training, panel_primairy_selector, panel_main_overview, panel_controls, \
     panel_secondary_selector
 from util.agent_base import BaseTrainingAgent
-from gui.gamestate_functions import game_state_error_correction, game_state_render_snapshot, \
+from gui.gui_snapshot import game_state_error_correction, game_state_render_snapshot, \
     game_state_update_snapshot, game_state_update_ui, game_state_push_snapshot, game_state_fetch_snapshot
+
+
+def build_interface_base(agent: BaseTrainingAgent):
+    top = tk.Tk()
+    interface = InterfaceVariables()
+    interface.agent = agent
+    agent.snapshot.update(agent.game_state)
+    panel_main_overview(top, agent, interface)
+    panel_primairy_selector(top, agent, interface)
+    # panel_secondary_selector(top, agent, interface)
+    panel_controls(top, agent, interface)
+    panel_training(top, agent, interface)
+
+    top.data = interface
+    return top, interface
 
 
 def build_interface(agent: BaseTrainingAgent):
@@ -31,48 +46,36 @@ def build_interface(agent: BaseTrainingAgent):
     return top
 
 
-def build_interface_base(agent: BaseTrainingAgent):
-    top = tk.Tk()
-    interface = InterfaceVariables()
-    interface.agent = agent
-    agent.snapshot.update(agent.game_state)
-    panel_main_overview(top, agent, interface)
-    panel_primairy_selector(top, agent, interface)
-    panel_secondary_selector(top, agent, interface)
-    panel_controls(top, agent, interface)
-    panel_training(top, agent, interface)
-
-    top.data = interface
-    return top, interface
-
-
 def build_task_snapshot_loop(root, agent, interface):
     def loop_snapshot():
         # Tkinter main loop. Check for errors and correct them at the start
         game_state_error_correction(agent, interface)
-        if not interface.info(ControlVariables.freeze) and not interface.info(ControlVariables.live) and \
-                not interface.info(ControlVariables.preview) and not agent.snapshot_load_flag:
+
+        is_frozen = interface.info(ControlVariables.freeze)
+        is_live = interface.info(ControlVariables.live)
+        is_preview = interface.info(ControlVariables.preview)
+        is_loading = agent.snapshot_load_flag
+
+        if not is_frozen and not is_live and is_preview and not is_loading:
             game_state_fetch_snapshot(agent, interface)
             # game_state_update_snapshot(agent, interface)
             agent.snapshot_live_flag = False
-        elif agent.snapshot_load_flag:
-            agent.snapshot_load_flag = False
-            if not interface.info(ControlVariables.freeze):
-                # When not frozen the load button can override the game state
+        elif is_loading:
+            if not is_frozen:  # When not frozen the load button can override the game state
                 game_state_push_snapshot(agent, interface)
+            agent.snapshot_load_flag = False
             interface.update()
-        # elif interface.info(ControlVariables.freeze):
+        # elif is_frozen:
         # game_state_update_snapshot(agent, interface)
         # interface.update()
-        elif interface.info(ControlVariables.live):
+        elif is_live:
             agent.snapshot_live_flag = True
             # game_state_update_snapshot(agent, interface)
             game_state_push_snapshot(agent, interface)
             interface.update()
-        elif interface.info(ControlVariables.preview):
+        elif is_preview:
             game_state_render_snapshot(agent, interface)
             interface.update()
-        # root.after(50, loop_snapshot)
 
     return loop_snapshot
 
@@ -81,9 +84,11 @@ def build_task_check(root, agent, interface):
     def loop_check():
         # Because I did not want to reload the agent every time a change happened
         # Hot reload can be controlled when needed
-        agent.agent_is_reloadable = interface.game_info[ControlVariables.hot_reload].get() == 1
-        agent.agent_is_driving_example = interface.game_info[ControlVariables.psyonix_bot].get() == 0
-        # root.after(500, loop_check)
+        hot_reload = interface.game_info[ControlVariables.hot_reload].get() == 1
+        bot_example = interface.game_info[ControlVariables.psyonix_bot].get() == 0
+
+        agent.agent_is_reloadable = hot_reload
+        agent.agent_is_driving_example = bot_example
 
     return loop_check
 

@@ -1,13 +1,13 @@
 import tkinter as tk
 
 from gui.display_base import CanvasItem
-from gui.display_converter import CANVAS_WIDTH, CANVAS_HEIGHT, get_field_raw_shape, \
+from gui.display_convert import CANVAS_WIDTH, CANVAS_HEIGHT, get_field_raw_shape, \
     get_goal_raw_shape, convert_coord_to_raw_shape, \
     convert_raw_shape_to_coord
-from gui.display_functions import BALL_SHAPE, CURSOR_SHAPE, get_closest_item, \
+from gui.display_objects import BALL_SHAPE, CURSOR_SHAPE, get_closest_item, \
     check_changes_cars, get_selectable_items, calculate_angle, check_changes_items, calculate_distance, CURSOR_R_SHAPE
 
-from gui.gamestate_functions import game_state_update_ui
+from gui.gui_snapshot import game_state_update_ui
 from gui.gui_base import InterfaceVariables, PHYSICS_PANEL_PRIMARY, PHYSICS_PANEL_SECONDARY
 
 
