@@ -58,7 +58,7 @@ def load_snapshot(name, agent):
 def overwrite_snapshot_in_file(name, data):
     path = './stored_game_state.json'
     _create_file_if_not_exist(path, '[]')
-    existing_data: List = __read_json(path)
+    existing_data: List[dict] = __read_json(path)
     for snapshot in existing_data:
         if snapshot['Name'] == name:
             snapshot.update(data)

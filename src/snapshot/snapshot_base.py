@@ -4,7 +4,8 @@ import math
 from rlbot.utils.game_state_util import GameState
 from typing import Dict, Union
 
-from rlbot.utils.structures.game_data_struct import GameTickPacket
+from rlbot.utils.structures.game_data_struct import GameTickPacket, PlayerInfo, Physics, BallInfo, Vector3, Rotator
+from rlbot.utils.game_state_util import Rotator as SRotator, Vector3 as SVector3
 
 from snapshot.snapshot_structs import StructSnapshot, StructGameState, StructPhysics, StructCar
 
@@ -39,15 +40,18 @@ class SnapshotVector:
         if axis == 'y': self.data['y'] = self.y = value
         if axis == 'z': self.data['z'] = self.z = value
 
-    def update(self, vector: SnapshotVector):
+    def update(self, vector: Union[SnapshotVector, SVector3, Vector3]):
         self.data['x'] = self.x = vector.x
         self.data['y'] = self.y = vector.y
         self.data['z'] = self.z = vector.z
 
-    def update_rotator(self, rotator):
-        self.data['x'] = self.x = self.pitch = rotator.pitch * 180 / math.pi
-        self.data['y'] = self.y = self.yaw = rotator.yaw * 180 / math.pi
-        self.data['z'] = self.z = self.roll = rotator.roll * 180 / math.pi
+    def update_rotator(self, rotator: Union[Rotator, SnapshotVector]):
+        if type(rotator) is Rotator or type(rotator) is SRotator:
+            self.data['x'] = self.x = self.pitch = rotator.pitch * 180 / math.pi
+            self.data['y'] = self.y = self.yaw = rotator.yaw * 180 / math.pi
+            self.data['z'] = self.z = self.roll = rotator.roll * 180 / math.pi
+        elif type(rotator) is SnapshotVector:
+            self.update(rotator)
 
     def update_angular(self, rotator):
         self.data['x'] = self.x = rotator.x * 180 / math.pi
@@ -69,7 +73,7 @@ class SnapshotPhysics:
         self.rotation = SnapshotVector(data[StructPhysics.rotation])
         self.angular_velocity = SnapshotVector(data[StructPhysics.angular_velocity])
 
-    def update(self, physics: SnapshotPhysics):
+    def update(self, physics: Union[SnapshotPhysics, Physics]):
         self.location.update(physics.location)
         self.velocity.update(physics.velocity)
         self.rotation.update_rotator(physics.rotation)
@@ -81,7 +85,7 @@ class SnapshotPhysics:
         self.rotation.update_dict(physics[StructPhysics.rotation])
         self.angular_velocity.update_dict(physics[StructPhysics.angular_velocity])
 
-    def get(self, vector: str, axis: str=None) -> Union[SnapshotVector, float]:
+    def get(self, vector: str, axis: str = None) -> Union[SnapshotVector, float]:
         if axis:
             if vector == StructPhysics.location: return self.location.get(axis)
             if vector == StructPhysics.velocity: return self.velocity.get(axis)
@@ -102,6 +106,8 @@ class SnapshotBall:
     def update(self, ball):
         if type(ball) is dict:
             self.update_dict(ball)
+        elif type(ball) is BallInfo:
+            self.physics.update(ball.physics)
         else:
             self.physics.update(ball.physics)
 
@@ -122,6 +128,8 @@ class SnapshotCar:
     def update(self, car):
         if type(car) is dict:
             self.update_dict(car)
+        # elif type(car) is PlayerInfo:
+        #     self.physics
         else:
             self.physics.update(car.physics)
 
@@ -155,9 +163,9 @@ class Snapshot:
                 self.items[name].update(item)
             elif type(item) is dict:
                 self.items[name].update_dict(item)
-            else:
-                print('Probably a hot reload error, please ignore this error/message.')
-                # print(type(item), type(item) is SnapshotPhysics)  # Strange
+            # else:
+            #     print('Probably a hot reload error, please ignore this error/message.')
+            #     print(type(item), type(item) is SnapshotPhysics)  # Strange
         for name in self.items.copy():
             if name in items: continue
             self.items.pop(name)
@@ -170,9 +178,11 @@ class Snapshot:
         elif type(game_state) is GameState:
             ball = game_state.ball
             cars = game_state.cars
-        else:
+        elif type(game_state) is GameTickPacket:
             ball = game_state.game_ball
             cars = {i: d for i, d in enumerate(game_state.game_cars)}
+        else:
+            return
         # Conversion above deals with different data types
         self.ball.update(ball)
         for index, car in cars.items():

@@ -21,8 +21,10 @@ class BaseThreadManager:
             thread.start()
         self.threads.append(thread)
 
-    def add_task(self, task, freq=100):
+    def add_task(self, task, freq=100, name=''):
         thread = BaseHelperThread(task, self.running_event, freq)
+        if name != '':
+            thread.name = name
         if self.running_event.is_set():
             thread.start()
         self.threads.append(thread)
@@ -40,5 +42,12 @@ class BaseHelperThread(threading.Thread):
         interval = self.sleep
 
         while running.is_set():
-            self.task()
+            try:
+                self.task()
+            except RuntimeError as ex:
+                # running.clear()
+                print(ex.with_traceback(None))
+                break
             sleep(interval)
+        properly = 'with an error' if running.is_set() else 'properly'
+        print(f'Thread {self.name} closed {properly}')

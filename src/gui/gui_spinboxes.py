@@ -1,56 +1,72 @@
 import tkinter as tk
-from typing import Dict, List
+from typing import Dict
 
-from gui.building_blocks import make_spaced_label, _make_scrolling_event
 from gui.gui_base import InterfaceVariables, PhysicVariables, ControlVariables
-from snapshot.snapshot_base import Snapshot
-from util.bin.relative_physics import RelativePhysics
+from util.relative_physics import RelativePhysics
 
 
-def make_panel_physics(root, side=tk.TOP) -> Dict[str, Dict[str, tk.StringVar]]:
-    """Makes a panel where the location, velocity, rotation, and angular velocity
-    can be seen and adjusted. It returns a dictionary of a dictionary of tkinter
-    StringVars. Those StringVars must be filled with valid number values inside strings. """
-    frame = tk.Frame(root)
-    frame.pack()
-    spinbox_collection_vars = make_named_spinbox_collection(
-        frame, ['Location', 'Velocity', 'Rotation', 'Angular Velocity'], ['x', 'y', 'z'], side)
-    return spinbox_collection_vars
+def spinbox_cluster_DIP(spinbox_cluster: Dict[str, Dict[str, tk.StringVar]]):
+    """IDK what this is gonna do yet
+    tkinter variables of spinbox binding to data of something but
+    with a buffer inbetween
+    """
+
+    spinbox_buffer: Dict[str, Dict[str, float]] = {group: {name: 0 for name in items.keys()}
+                                                   for group, items in spinbox_cluster.items()}
+
+    task_list = []
+    for vector_name, spinbox_group in spinbox_cluster.items():
+        for axis, spinbox_var in spinbox_group.items():
+            bind = task(interface, spinbox_var, selected, vector_name, axis)
+            task_list.append(bind)
+
+    def spinbox_update():
+        if interface.selector.get(selected) is None:  # If no item is selected yet
+            return
+        data = interface.selector.get(selected).data
+        spinbox_var.set(f'{data[vector][axis]:.2f}')
+
+    def spinbox_bind():
+        if interface.selector.get(selected) is None:  # If no item is selected yet
+            return
+        if interface.info(ControlVariables.freeze) or interface.info(ControlVariables.live):
+            item = spinbox_var.get()
+            if not item:
+                item = 0
+            try:
+                value = interface.selector.get(selected).data[vector][axis]
+                item = float(item)
+                if value - item > 0.1 or value - item < - 0.1:
+                    interface.selector.get(selected).get(vector).set(axis, item)
+            except (ValueError, AttributeError):
+                pass
+        if not interface.info(ControlVariables.live):
+            physics = interface.selector.get(selected).data
+            spinbox_var.set(f'{physics[vector][axis]:.2f}')
 
 
-def make_named_spinbox_collection(root, group_list: List[str], name_list: List[str], side=tk.TOP):
-    """Creates a group of groups of spinboxes. Does nothing more special"""
-    spinbox_collection_vars = {}
-    for collection in group_list:
-        spinbox_collection_vars[collection] = make_named_spinbox_group(root, collection, name_list, side)
-    return spinbox_collection_vars
+def spinbox_bindings(interface: InterfaceVariables, spinbox_collection_vars: PhysicVariables, identifier: str):
+    """Takes the physics of an item and bind the physic variables to the spinbox_variables and back"""
+    function_list = build_spinbox_task_list(
+        build_spinbox_physics_binding, interface, spinbox_collection_vars, identifier)
+
+    def loop():
+        for binder in function_list:
+            binder()
+
+    interface.thread.add_task(loop, 10, 'SpinboxBinder')
 
 
-def make_named_spinbox_group(root, group_name: str, name_list: List[str], side=tk.TOP):
-    """Creates a group of special spinboxes.
-    The group name identifies what the group stands for."""
-    spinbox_group_vars = {}
-    frame = tk.Frame(root)
-    frame.pack(fill=tk.BOTH, expand=1, side=side)
-    make_spaced_label(frame, group_name)
-    for name in name_list:
-        spinbox_var = make_named_spinbox(frame, name)
-        spinbox_group_vars[name] = spinbox_var
-    return spinbox_group_vars
+def spinbox_updater(interface: InterfaceVariables, spinbox_collection_vars: PhysicVariables, identifier: str):
+    """Takes the physics of an item and bind the physic variables to the spinbox_variables"""
+    updater_list = build_spinbox_task_list(
+        build_spinbox_physics_updater, interface, spinbox_collection_vars, identifier)
 
+    def loop():
+        for updater in updater_list:
+            updater()
 
-def make_named_spinbox(root, name: str):
-    """Creates a spinbox with an explaining text to the left.
-    This spinbox is scrollable so that the values are easily changed."""
-    frame = tk.Frame(root)
-    frame.pack(fill=tk.BOTH, expand=1)
-    label = tk.Label(frame, text=name)
-    label.pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
-    spinbox_var = tk.StringVar(frame, value='0.00')
-    spinbox = tk.Spinbox(frame, textvariable=spinbox_var, from_=-10000, to=10000, increment=0.05)
-    spinbox.bind('<MouseWheel>', _make_scrolling_event(spinbox_var, 5))
-    spinbox.pack(side=tk.RIGHT)
-    return spinbox_var
+    interface.selector_updater[identifier] = loop
 
 
 def build_spinbox_task_list(task, interface: InterfaceVariables, spinbox_collection_vars: PhysicVariables,
@@ -61,30 +77,6 @@ def build_spinbox_task_list(task, interface: InterfaceVariables, spinbox_collect
             bind = task(interface, spinbox_var, selected, vector, axis)
             task_list.append(bind)
     return task_list
-
-
-def spinbox_bindings(root: tk.Tk, interface: InterfaceVariables, spinbox_collection_vars: PhysicVariables,
-                     selected: str):
-    """Takes the physics of an item and bind the physic variables to the spinbox_variables and back"""
-    function_list = build_spinbox_task_list(build_spinbox_physics_binding, interface, spinbox_collection_vars, selected)
-
-    def loop():
-        for binder in function_list:
-            binder()
-
-    interface.thread.add_task(loop, 10)
-
-
-def spinbox_updater(interface: InterfaceVariables, spinbox_collection_vars: PhysicVariables,
-                    selected: str):
-    """Takes the physics of an item and bind the physic variables to the spinbox_variables"""
-    updater_list = build_spinbox_task_list(build_spinbox_physics_updater, interface, spinbox_collection_vars, selected)
-
-    def loop():
-        for updater in updater_list:
-            updater()
-
-    interface.selector_updater[selected] = loop
 
 
 def build_spinbox_physics_updater(interface: InterfaceVariables, spinbox_var: tk.StringVar, selected: str, vector: str,
@@ -148,7 +140,7 @@ def spinbox_bindings_relative(root: tk.Tk, interface: InterfaceVariables, spinbo
         physics = interface.selector[id3].get_normal()
         interface.selector[id2].update(physics)
 
-    interface.thread.add_task(loop, 10)
+    interface.thread.add_task(loop, 10, 'SpinboxRelative')
 
 
 def spinbox_updater_relative(interface: InterfaceVariables, spinbox_collection_vars: PhysicVariables,

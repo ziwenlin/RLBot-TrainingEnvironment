@@ -1,8 +1,8 @@
-from snapshot.snapshot_base import SnapshotPhysics, PhysicsData
+from snapshot.snapshot_base import SnapshotPhysics
 from util.agent_base import BaseTrainingAgent
 from gui.gui_base import InterfaceVariables, PhysicVariables
 from snapshot.snapshot_structs import convert_snapshot_to_game_state, StructSnapshot
-from util.bin.relative_physics import calculate_relative, calculate_back
+from util.relative_physics import calculate_relative, calculate_back
 
 
 def game_state_error_correction(agent: BaseTrainingAgent, data_vars: InterfaceVariables):
@@ -21,7 +21,8 @@ def game_state_render_snapshot(agent: BaseTrainingAgent, data_vars):
 def game_state_fetch_snapshot(agent: BaseTrainingAgent, interface: InterfaceVariables):
     """Fetching game state from the agent to a snapshot. The current game state will be the snapshot."""
     # game_state: StructSnapshot.game_state = convert_game_state_to_snapshot(agent.game_state)
-    agent.snapshot.update(agent.game_state)  # Save the taken snapshot
+    agent.snapshot.update(agent.game_packet)
+    # agent.snapshot.update(agent.game_state)  # Save the taken snapshot
     agent.snapshot.update_items(agent.game_items)
     interface.game_info['Debug a'].set(f'{agent.agent_controller.steer * 50 + 50: .2f}')
     interface.game_info['Debug b'].set(f'{agent.agent_controller.throttle * 50 + 50: .2f}')

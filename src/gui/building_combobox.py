@@ -23,7 +23,7 @@ def make_combobox(root, agent: BaseTrainingAgent, interface: InterfaceVariables,
 
     for bindings in ('<<ComboboxSelected>>',):
         combobox.bind(bindings, combobox_event_select)
-    interface.thread.add_task(update)
+    interface.thread.add_task(update, name='Combobox')
 
 
 def build_combobox_select_update(combobox: ttk.Combobox, agent: BaseTrainingAgent, interface: InterfaceVariables,

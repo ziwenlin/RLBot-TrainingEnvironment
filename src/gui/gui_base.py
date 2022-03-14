@@ -3,7 +3,7 @@ from typing import Dict, Union, Callable
 
 from snapshot.snapshot_base import SnapshotPhysics
 from util.agent_base import BaseTrainingAgent
-from util.bin.relative_physics import RelativePhysics
+from util.relative_physics import RelativePhysics
 from util.thread_base import BaseThreadManager
 
 PhysicVariables = Dict[str, Dict[str, tk.StringVar]]

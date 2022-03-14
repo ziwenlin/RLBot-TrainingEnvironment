@@ -6,7 +6,6 @@ from exercise.training_main import TrainingManager
 from minds.example_bot import example_controller
 from util.agent_base import BaseTrainingAgent
 from util.thread_agent import ThreadManagerAgent
-from util.remove.vec import Vec3
 
 ALIVE_INTERVAL = (2 * 60 * 30)
 
@@ -34,7 +33,7 @@ class BaseTrainingEnvironmentAgent(BaseAgent, BaseTrainingAgent):
     def update_environment(self, packet: GameTickPacket):
         if self.lifetime > 6000:
             pass  # Don't waste compute power on all if-statements
-        elif self.thread_manager is not ThreadManagerAgent and self.lifetime == 30:
+        elif self.thread_manager is not ThreadManagerAgent and self.lifetime == 60:
             """After a set time the interface get initiated. It should 
             execute at 30th tick in the game."""
             self.training = TrainingManager(self)

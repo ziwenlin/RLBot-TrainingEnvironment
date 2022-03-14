@@ -1,6 +1,6 @@
 from math import sin, pi, cos
 
-from util.bin.boolean_signals import BoolEdge
+from util.boolean_signals import BoolEdge
 from snapshot.snapshot_structs import StructSnapshot
 
 FIELD_LENGHT = 5120

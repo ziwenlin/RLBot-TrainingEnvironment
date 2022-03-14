@@ -1,4 +1,5 @@
 import tkinter as tk
+from typing import List
 
 from gui.display_base import CanvasItem
 from gui.display_convert import CANVAS_WIDTH, CANVAS_HEIGHT, get_field_raw_shape, \
@@ -9,6 +10,7 @@ from gui.display_objects import BALL_SHAPE, CURSOR_SHAPE, get_closest_item, \
 
 from gui.gui_snapshot import game_state_update_ui
 from gui.gui_base import InterfaceVariables, PHYSICS_PANEL_PRIMARY, PHYSICS_PANEL_SECONDARY
+from util.agent_base import BaseTrainingAgent
 
 
 def panel_display(base, agent, interface: InterfaceVariables):
@@ -118,12 +120,13 @@ def panel_display(base, agent, interface: InterfaceVariables):
 
     update = build_task_update(interface, agent, canvas, canvas_items)
     draw = build_task_draw(interface, cursor, cursor_relative, canvas_items)
-    interface.thread.add_task(update, 10)
-    interface.thread.add_task(draw, 50)
+    interface.thread.add_task(update, 10, 'CanvasUpdater')
+    interface.thread.add_task(draw, 50, 'CanvasRenderer')
     canvas.pack()
 
 
-def build_task_draw(interface, cursor, cursor_relative, canvas_items):
+def build_task_draw(interface: InterfaceVariables, cursor: CanvasItem, cursor_relative: CanvasItem,
+                    canvas_items: List[CanvasItem]):
     def draw():
         for item in canvas_items:
             item.update()
@@ -135,7 +138,8 @@ def build_task_draw(interface, cursor, cursor_relative, canvas_items):
     return draw
 
 
-def build_task_update(interface, agent, canvas, canvas_items):
+def build_task_update(interface: InterfaceVariables, agent: BaseTrainingAgent, canvas: tk.Canvas,
+                      canvas_items: List[CanvasItem]):
     def update():
         check_changes_cars(canvas, agent, canvas_items)
         check_changes_items(canvas, agent, canvas_items)

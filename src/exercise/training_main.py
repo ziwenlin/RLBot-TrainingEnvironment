@@ -7,7 +7,7 @@ from rlbot.utils.structures.game_data_struct import GameTickPacket
 
 from exercise.training_base import BaseTrainingManager
 from exercise.exercise_base import BaseExercise, EpisodeManager
-from util.bin.console_helper import display_episode
+from util.console_helper import display_episode
 from snapshot.snapshot_structs import convert_snapshot_to_game_state
 from snapshot.file_functions import load_snapshot
 

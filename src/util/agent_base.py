@@ -12,7 +12,7 @@ class BaseTrainingAgent:
 
     def __init__(self):
         self.game_state: GameState = generate_game_state()
-        self.game_packet: GameTickPacket
+        self.game_packet: GameTickPacket = GameTickPacket()
         self.game_items: dict = {}
 
         self.snapshot: Snapshot = Snapshot()

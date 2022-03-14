@@ -1,17 +1,16 @@
 import tkinter as tk
 
 from gui.building_blocks import make_check_button, make_slider, make_button, make_base_frame, make_spacer, \
-    make_labeled_entry, make_spaced_label
-from gui.building_spinbox import make_panel_physics, spinbox_bindings, spinbox_updater, \
+    make_labeled_entry, make_spaced_label, make_named_spinbox_cluster
+from gui.building_combobox import make_combobox
+from gui.gui_spinboxes import spinbox_bindings, spinbox_updater, \
     spinbox_updater_relative, spinbox_bindings_relative
 from gui.display_panel import panel_display
-from gui.gui_base import InterfaceVariables, CONTROL_CHECKBOXES, CONTROL_SLIDERS, ControlVariables, \
-    PHYSICS_PANEL_PRIMARY, PHYSICS_PANEL_SECONDARY, PHYSICS_PANEL_SECONDARY_RELATIVE
-from gui.building_combobox import make_combobox
+from gui.gui_base import InterfaceVariables, CONTROL_CHECKBOXES, CONTROL_SLIDERS, PHYSICS_PANEL_PRIMARY, \
+    PHYSICS_PANEL_SECONDARY, PHYSICS_PANEL_SECONDARY_RELATIVE
 from gui.gui_snapshot import game_state_fetch_snapshot, game_state_push_snapshot
 from snapshot.file_functions import save_snapshot, load_snapshot
 from util.agent_base import BaseTrainingAgent
-from util.bin.relative_physics import RelativePhysics
 
 
 def panel_main_overview(base, agent: BaseTrainingAgent, interface: InterfaceVariables):
@@ -31,16 +30,21 @@ def panel_main_overview(base, agent: BaseTrainingAgent, interface: InterfaceVari
 
 def panel_primairy_selector(base, agent: BaseTrainingAgent, interface: InterfaceVariables):
     """Mid panel
-    Selecting item based on normal physics"""
+    Makes a panel where the location, velocity, rotation, and angular velocity
+    can be seen and adjusted. It returns a dictionary of a dictionary of tkinter
+    StringVars. Those StringVars must be filled with valid number values inside strings. """
     frame = make_base_frame(base)
     identifier = PHYSICS_PANEL_PRIMARY
     make_combobox(frame, agent, interface, identifier)
-    interface.selector_vars[identifier] = make_panel_physics(frame, side=tk.TOP)
-    spinbox_bindings(frame, interface, interface.selector_vars[identifier], identifier)
+
+    collection = {collection: ['x', 'y', 'z'] for collection in
+                  ['Location', 'Velocity', 'Rotation', 'Angular Velocity']}
+    interface.selector_vars[identifier] = make_named_spinbox_cluster(frame, collection, tk.TOP)
+    spinbox_bindings(interface, interface.selector_vars[identifier], identifier)
     spinbox_updater(interface, interface.selector_vars[identifier], identifier)
 
     make_spacer(frame, 10)
-    make_slider(frame, interface.car_data, 'Boost')
+    make_slider(frame, 'Boost', interface.car_data)
 
     # TODO setting jumped and doubble jumped is not supported by RLbot
     # make_spacer(frame, 10)
@@ -48,6 +52,7 @@ def panel_primairy_selector(base, agent: BaseTrainingAgent, interface: Interface
     #     make_check_button(frame, data_vars.car_data, check_name)
 
 
+@DeprecationWarning
 def panel_secondary_selector(base, agent: BaseTrainingAgent, interface: InterfaceVariables):
     """Mid panel
     Selecting item based on relative physics"""
@@ -55,7 +60,9 @@ def panel_secondary_selector(base, agent: BaseTrainingAgent, interface: Interfac
     identifier = PHYSICS_PANEL_SECONDARY
     identifier_relative = PHYSICS_PANEL_SECONDARY_RELATIVE
     make_combobox(frame, agent, interface, identifier)
-    interface.selector_vars[identifier] = make_panel_physics(frame, side=tk.TOP)
+    collection = {collection: ['x', 'y', 'z'] for collection in
+                  ['Location', 'Velocity', 'Rotation', 'Angular Velocity']}
+    interface.selector_vars[identifier] = make_named_spinbox_cluster(frame, collection, tk.TOP)
     spinbox_bindings_relative(frame, interface, interface.selector_vars[identifier],
                               PHYSICS_PANEL_PRIMARY, identifier, identifier_relative)
     spinbox_updater_relative(interface, interface.selector_vars[identifier],
@@ -68,16 +75,16 @@ def panel_controls(base, agent: BaseTrainingAgent, interface: InterfaceVariables
     make_spaced_label(frame, 'Control panel')
 
     for check_name in CONTROL_CHECKBOXES:
-        make_check_button(frame, interface.game_info, check_name)
+        make_check_button(frame, check_name, interface.game_info)
 
     for slider_name in CONTROL_SLIDERS:
         make_spacer(frame, 10)
-        make_slider(frame, interface.game_info, slider_name)
+        make_slider(frame, slider_name, interface.game_info)
 
     # TODO make a building base for debugging in tkinter
     make_spacer(frame, 10)
-    make_slider(frame, interface.game_info, 'Debug a')
-    make_slider(frame, interface.game_info, 'Debug b')
+    make_slider(frame, 'Debug a', interface.game_info)
+    make_slider(frame, 'Debug b', interface.game_info)
     # debug_text = tk.StringVar(frame, value='Nothing yet')
     # interface.game_info[ControlVariables.debug] = debug_text
     # debug_label = tk.Scale(frame, variable=debug_text, anchor='w', padx=5)
@@ -102,21 +109,21 @@ def panel_training(base, agent: BaseTrainingAgent, data_vars: InterfaceVariables
         agent.training.start_training(training_entry)
 
     snapshot_entry = make_labeled_entry(frame, 'Snapshot name')
-    make_button(frame, save_command, 'Save')
-    make_button(frame, load_command, 'Load')
+    make_button(frame, 'Save', save_command)
+    make_button(frame, 'Load', load_command)
 
     c = lambda: game_state_fetch_snapshot(agent, data_vars)
-    make_button(frame, c, "New snapshot")
+    make_button(frame, "New snapshot", c)
     c = lambda: game_state_push_snapshot(agent, data_vars)
-    make_button(frame, c, "Set snapshot")
+    make_button(frame, "Set snapshot", c)
 
     # make_spacer(frame, 10)
     training_entry = make_labeled_entry(frame, 'Training pack')
 
-    make_button(frame, start_training, 'Start training')
-    make_button(frame, agent.training.stop_training, 'Stop training')
-    make_button(frame, agent.training.resume_training, 'Resume training')
-    make_button(frame, next_exercise, 'Next exercise')
+    make_button(frame, 'Start training', start_training)
+    make_button(frame, 'Stop training', agent.training.stop_training)
+    make_button(frame, 'Resume training', agent.training.resume_training)
+    make_button(frame, 'Next exercise', next_exercise)
 
 
 def panel_load(base, data_vars):
@@ -138,5 +145,3 @@ def panel_load(base, data_vars):
 
     data_frame = tk.Frame(mid_frame)
     data_frame.pack()
-
-

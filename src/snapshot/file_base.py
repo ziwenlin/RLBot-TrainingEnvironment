@@ -1,4 +1,5 @@
 import json
+from typing import List
 
 
 def _file_exist(path):
@@ -23,7 +24,7 @@ def _read_file(path):
         return f.read()
 
 
-def __read_json(path):
+def __read_json(path) -> List[dict]:
     return json.loads(
         _read_file(path))
 
