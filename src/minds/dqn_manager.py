@@ -13,7 +13,7 @@ from keras.layers import Conv2D, Activation, MaxPooling2D, Dropout, Flatten, Den
 from keras.optimizer_v2.adam import Adam
 from rlbot.agents.base_agent import SimpleControllerState
 
-from util.agent_base import BaseTrainingAgent
+from util.agent_base import BaseTrainingEnvironment
 
 DISCOUNT = 0.99
 REPLAY_MEMORY_SIZE = 50_000  # How many last steps to keep for model training
@@ -52,7 +52,7 @@ env = Environment()
 
 
 class DQNManager:
-    def __init__(self, agent: BaseTrainingAgent):
+    def __init__(self, agent: BaseTrainingEnvironment):
         self.agents: Dict[str, DQNAgent] = {}
         self.manager = agent
         self.epsilon = 1
@@ -291,4 +291,4 @@ class DQNAgent:
 
 
 if __name__ == '__main__':
-    test = DQNManager(BaseTrainingAgent())
+    test = DQNManager(BaseTrainingEnvironment())

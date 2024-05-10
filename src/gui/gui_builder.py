@@ -6,12 +6,12 @@ from rlbot.utils.structures.game_data_struct import PlayerInfo, GameTickPacket, 
 from gui.gui_base import InterfaceVariables, ControlVariables
 from gui.gui_panels import panel_training, panel_primairy_selector, panel_main_overview, panel_controls, \
     panel_secondary_selector
-from util.agent_base import BaseTrainingAgent
+from util.agent_base import BaseTrainingEnvironment
 from gui.gui_snapshot import game_state_error_correction, game_state_render_snapshot, \
     game_state_update_snapshot, game_state_update_ui, game_state_push_snapshot, game_state_fetch_snapshot
 
 
-def build_interface_base(agent: BaseTrainingAgent):
+def build_interface_base(agent: BaseTrainingEnvironment):
     top = tk.Tk()
     interface = InterfaceVariables()
     interface.agent = agent
@@ -26,7 +26,7 @@ def build_interface_base(agent: BaseTrainingAgent):
     return top, interface
 
 
-def build_interface(agent: BaseTrainingAgent):
+def build_interface(agent: BaseTrainingEnvironment):
     top, interface = build_interface_base(agent)
 
     loop_snapshot = build_task_snapshot_loop(top, agent, interface)
@@ -48,7 +48,7 @@ def build_interface(agent: BaseTrainingAgent):
     return top, interface
 
 
-def build_task_snapshot_loop(root, agent: BaseTrainingAgent, interface: InterfaceVariables):
+def build_task_snapshot_loop(root, agent: BaseTrainingEnvironment, interface: InterfaceVariables):
     def loop_snapshot():
         # Tkinter main loop. Check for errors and correct them at the start
         game_state_error_correction(agent, interface)
@@ -82,7 +82,7 @@ def build_task_snapshot_loop(root, agent: BaseTrainingAgent, interface: Interfac
     return loop_snapshot
 
 
-def build_task_check(root, agent: BaseTrainingAgent, interface: InterfaceVariables):
+def build_task_check(root, agent: BaseTrainingEnvironment, interface: InterfaceVariables):
     def loop_check():
         # Because I did not want to reload the agent every time a change happened
         # Hot reload can be controlled when needed
@@ -98,7 +98,7 @@ def build_task_check(root, agent: BaseTrainingAgent, interface: InterfaceVariabl
     return loop_check
 
 
-def build_task_standalone(agent: BaseTrainingAgent, interface: InterfaceVariables):
+def build_task_standalone(agent: BaseTrainingEnvironment, interface: InterfaceVariables):
     def move(physics: Physics, multiplier=1):
         physics.location.y += multiplier
         if physics.location.y > 5000:
@@ -116,7 +116,7 @@ def build_task_standalone(agent: BaseTrainingAgent, interface: InterfaceVariable
     return loop
 
 
-def build_interface_standalone(agent: BaseTrainingAgent):
+def build_interface_standalone(agent: BaseTrainingEnvironment):
     # Filling the missing data when running the program without Rocket League
     agent.game_state.ball.physics.location.y = 1000
     agent.snapshot.update(agent.game_state)

@@ -8,7 +8,7 @@ from snapshot.snapshot_base import Snapshot
 from util.thread_base import BaseThreadManager
 
 
-class BaseTrainingAgent:
+class BaseTrainingEnvironment:
 
     def __init__(self):
         self.game_state: GameState = generate_game_state()

@@ -10,10 +10,10 @@ from gui.gui_base import InterfaceVariables, CONTROL_CHECKBOXES, CONTROL_SLIDERS
     PHYSICS_PANEL_SECONDARY, PHYSICS_PANEL_SECONDARY_RELATIVE
 from gui.gui_snapshot import game_state_fetch_snapshot, game_state_push_snapshot
 from snapshot.file_functions import save_snapshot, load_snapshot
-from util.agent_base import BaseTrainingAgent
+from util.agent_base import BaseTrainingEnvironment
 
 
-def panel_main_overview(base, agent: BaseTrainingAgent, interface: InterfaceVariables):
+def panel_main_overview(base, agent: BaseTrainingEnvironment, interface: InterfaceVariables):
     """Left panel
     It contains a canvas for the field overlay/overview
     And it has the editable fields for ball physics"""
@@ -28,7 +28,7 @@ def panel_main_overview(base, agent: BaseTrainingAgent, interface: InterfaceVari
     # spinbox_updater(interface, interface.selector_vars['Ball'], 'Ball')
 
 
-def panel_primairy_selector(base, agent: BaseTrainingAgent, interface: InterfaceVariables):
+def panel_primairy_selector(base, agent: BaseTrainingEnvironment, interface: InterfaceVariables):
     """Mid panel
     Makes a panel where the location, velocity, rotation, and angular velocity
     can be seen and adjusted. It returns a dictionary of a dictionary of tkinter
@@ -53,7 +53,7 @@ def panel_primairy_selector(base, agent: BaseTrainingAgent, interface: Interface
 
 
 @DeprecationWarning
-def panel_secondary_selector(base, agent: BaseTrainingAgent, interface: InterfaceVariables):
+def panel_secondary_selector(base, agent: BaseTrainingEnvironment, interface: InterfaceVariables):
     """Mid panel
     Selecting item based on relative physics"""
     frame = make_base_frame(base)
@@ -69,7 +69,7 @@ def panel_secondary_selector(base, agent: BaseTrainingAgent, interface: Interfac
                              PHYSICS_PANEL_PRIMARY, identifier, identifier_relative)
 
 
-def panel_controls(base, agent: BaseTrainingAgent, interface: InterfaceVariables):
+def panel_controls(base, agent: BaseTrainingEnvironment, interface: InterfaceVariables):
     """Right panel"""
     frame = make_base_frame(base)
     make_spaced_label(frame, 'Control panel')
@@ -91,7 +91,7 @@ def panel_controls(base, agent: BaseTrainingAgent, interface: InterfaceVariables
     # debug_label.pack(fill=tk.BOTH)
 
 
-def panel_training(base, agent: BaseTrainingAgent, data_vars: InterfaceVariables):
+def panel_training(base, agent: BaseTrainingEnvironment, data_vars: InterfaceVariables):
     frame = make_base_frame(base)
 
     def next_exercise():

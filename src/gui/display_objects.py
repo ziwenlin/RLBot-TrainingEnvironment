@@ -6,6 +6,7 @@ from gui.display_convert import convert_game_location_to_coord, convert_coord_to
 from snapshot.snapshot_structs import StructGameState, StructCar
 
 from gui.display_base import CanvasItem
+from util.agent_base import BaseTrainingEnvironment
 
 CAR_ARROW_SHAPE = (0, -5, 18, -14, 0, 25, -18, -14)
 CAR_BODY_SHAPE = (6, 8, 6, -8, -6, -8, -6, 8)
@@ -17,7 +18,7 @@ CAR_CANVAS_ITEMS = 2
 
 
 # TODO
-def check_changes_items(canvas, agent, items):
+def check_changes_items(canvas, agent: BaseTrainingEnvironment, items: List[CanvasItem]):
     snapshot_items = agent.snapshot.items
     canvas_items: List[CanvasItem] = [item for item in items if item.is_extra]
     if len(canvas_items) == len(snapshot_items):
@@ -37,7 +38,7 @@ def check_changes_items(canvas, agent, items):
         items.append(item)
 
 
-def check_changes_cars(canvas, agent, items):
+def check_changes_cars(canvas, agent: BaseTrainingEnvironment, items: List[CanvasItem]):
     snapshot_cars = agent.snapshot.cars
     car_items: List[CanvasItem] = [item for item in items if item.is_car]
     if len(car_items) == len(snapshot_cars) * CAR_CANVAS_ITEMS:
@@ -49,7 +50,7 @@ def check_changes_cars(canvas, agent, items):
             item.destroy()
         return  # Detected a change. A car has vanished
     existing_cars_indices = [get_car_id(car) for car in car_items]
-    for index, car in snapshot_cars.items():
+    for index in list(snapshot_cars.keys()):
         # Detected a change. A car has appeared
         if index in existing_cars_indices: continue
         arrow = CanvasItem(canvas, f'arrow {index + 1}', CAR_ARROW_SHAPE, car.physics)

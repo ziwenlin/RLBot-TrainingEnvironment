@@ -2,7 +2,7 @@ import tkinter as tk
 from typing import Dict, Union, Callable
 
 from snapshot.snapshot_base import SnapshotPhysics
-from util.agent_base import BaseTrainingAgent
+from util.agent_base import BaseTrainingEnvironment
 from util.relative_physics import RelativePhysics
 from util.thread_base import BaseThreadManager
 
@@ -23,7 +23,7 @@ class InterfaceVariables:
     selector_vars: SelectorVariables = {}
     selector_updater: SelectorUpdater = {}
 
-    agent: BaseTrainingAgent = None
+    agent: BaseTrainingEnvironment = None
     thread = BaseThreadManager()
 
     def update(self):

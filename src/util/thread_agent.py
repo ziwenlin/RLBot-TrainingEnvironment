@@ -2,7 +2,7 @@ import threading
 from time import sleep
 from typing import List
 
-from util.agent_base import BaseTrainingAgent
+from util.agent_base import BaseTrainingEnvironment
 from util.thread_base import BaseThreadManager
 from util.thread_interface import InterfaceMainThread
 
@@ -18,7 +18,7 @@ class DQNManagerThread(threading.Thread):
     def __init__(self, running_flag, agent, index):
         super().__init__(daemon=True)
         self.running_flag: threading.Event = running_flag
-        self.agent: BaseTrainingAgent = agent
+        self.agent: BaseTrainingEnvironment = agent
         self.index = index
 
     def run(self):

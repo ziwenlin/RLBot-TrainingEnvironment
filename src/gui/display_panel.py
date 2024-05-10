@@ -10,7 +10,7 @@ from gui.display_objects import BALL_SHAPE, CURSOR_SHAPE, get_closest_item, \
 
 from gui.gui_snapshot import game_state_update_ui
 from gui.gui_base import InterfaceVariables, PHYSICS_PANEL_PRIMARY, PHYSICS_PANEL_SECONDARY
-from util.agent_base import BaseTrainingAgent
+from util.agent_base import BaseTrainingEnvironment
 
 
 def panel_display(base, agent, interface: InterfaceVariables):
@@ -138,7 +138,7 @@ def build_task_draw(interface: InterfaceVariables, cursor: CanvasItem, cursor_re
     return draw
 
 
-def build_task_update(interface: InterfaceVariables, agent: BaseTrainingAgent, canvas: tk.Canvas,
+def build_task_update(interface: InterfaceVariables, agent: BaseTrainingEnvironment, canvas: tk.Canvas,
                       canvas_items: List[CanvasItem]):
     def update():
         check_changes_cars(canvas, agent, canvas_items)

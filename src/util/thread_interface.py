@@ -5,14 +5,14 @@ from time import sleep
 
 from gui.gui_base import InterfaceVariables
 from gui.gui_builder import build_interface
-from util.agent_base import BaseTrainingAgent
+from util.agent_base import BaseTrainingEnvironment
 
 
 class InterfaceMainThread(threading.Thread):
     def __init__(self, agent, running_event):
         super().__init__(daemon=True)
         self.running_flag: threading.Event = running_event
-        self.agent: BaseTrainingAgent = agent
+        self.agent: BaseTrainingEnvironment = agent
 
     def run(self):
         running = self.running_flag

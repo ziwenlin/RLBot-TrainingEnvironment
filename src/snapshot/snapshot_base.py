@@ -180,7 +180,7 @@ class Snapshot:
             cars = game_state.cars
         elif type(game_state) is GameTickPacket:
             ball = game_state.game_ball
-            cars = {i: d for i, d in enumerate(game_state.game_cars)}
+            cars = {i: d for i, d in enumerate(game_state.game_cars) if d.name != ""}
         else:
             return
         # Conversion above deals with different data types

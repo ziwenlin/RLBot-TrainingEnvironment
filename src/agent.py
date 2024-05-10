@@ -4,13 +4,13 @@ from rlbot.utils.structures.game_data_struct import GameTickPacket
 
 from exercise.training_main import TrainingManager
 from minds.example_bot import example_controller
-from util.agent_base import BaseTrainingAgent
+from util.agent_base import BaseTrainingEnvironment
 from util.thread_agent import ThreadManagerAgent
 
 ALIVE_INTERVAL = (2 * 60 * 30)
 
 
-class BaseTrainingEnvironmentAgent(BaseAgent, BaseTrainingAgent):
+class BaseTrainingEnvironmentAgent(BaseAgent, BaseTrainingEnvironment):
     """Base of the training environment agent. Inherit this class to get access to a
      full blown interface which can:
 
@@ -27,7 +27,7 @@ class BaseTrainingEnvironmentAgent(BaseAgent, BaseTrainingAgent):
 
     def __init__(self, name, team, index):
         BaseAgent.__init__(self, name, team, index)
-        BaseTrainingAgent.__init__(self)
+        BaseTrainingEnvironment.__init__(self)
         # self.tps_graph = Graph1D((50, 50, 300, 300))
 
     def update_environment(self, packet: GameTickPacket):
@@ -70,6 +70,7 @@ class BaseTrainingEnvironmentAgent(BaseAgent, BaseTrainingAgent):
         """The update controller checks whether the agent should drive,
         playing dumb or standing still"""
         if self.agent_is_driving:
+            # Example is dumb, should remove it soon
             if self.agent_is_driving_example:
                 # Agent should be driving and be controlled
                 controls = self.run_agent(packet)

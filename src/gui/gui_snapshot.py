@@ -1,24 +1,24 @@
 from snapshot.snapshot_base import SnapshotPhysics
-from util.agent_base import BaseTrainingAgent
+from util.agent_base import BaseTrainingEnvironment
 from gui.gui_base import InterfaceVariables, PhysicVariables
 from snapshot.snapshot_structs import convert_snapshot_to_game_state, StructSnapshot
 from util.relative_physics import calculate_relative, calculate_back
 
 
-def game_state_error_correction(agent: BaseTrainingAgent, data_vars: InterfaceVariables):
+def game_state_error_correction(agent: BaseTrainingEnvironment, data_vars: InterfaceVariables):
     """Check if any sudden changes occurs in the game or gui and corrects those errors"""
     # if agent.game_packet.num_cars <= data_vars.select_car.get():
     #     data_vars.select_car.set(0)
 
 
 # TODO why is this less glitchy and what does it do, I forgot...?
-def game_state_render_snapshot(agent: BaseTrainingAgent, data_vars):
+def game_state_render_snapshot(agent: BaseTrainingEnvironment, data_vars):
     """Calls the render function to show the positions live in game
     This only draws some marks on the map, good for debugging
     This is less glitch-y than the other function"""
 
 
-def game_state_fetch_snapshot(agent: BaseTrainingAgent, interface: InterfaceVariables):
+def game_state_fetch_snapshot(agent: BaseTrainingEnvironment, interface: InterfaceVariables):
     """Fetching game state from the agent to a snapshot. The current game state will be the snapshot."""
     # game_state: StructSnapshot.game_state = convert_game_state_to_snapshot(agent.game_state)
     agent.snapshot.update(agent.game_packet)
@@ -29,7 +29,7 @@ def game_state_fetch_snapshot(agent: BaseTrainingAgent, interface: InterfaceVari
     interface.update()
 
 
-def game_state_push_snapshot(agent: BaseTrainingAgent, interface: InterfaceVariables):
+def game_state_push_snapshot(agent: BaseTrainingEnvironment, interface: InterfaceVariables):
     """Pushing snapshot so that the game state is overridden.
      The base agent manager will setup the cars and ball into their positions."""
     agent.snapshot_override_flag = True
@@ -38,7 +38,7 @@ def game_state_push_snapshot(agent: BaseTrainingAgent, interface: InterfaceVaria
 
 
 @DeprecationWarning
-def game_state_update_snapshot(agent: BaseTrainingAgent, data_vars: InterfaceVariables):
+def game_state_update_snapshot(agent: BaseTrainingEnvironment, data_vars: InterfaceVariables):
     """Reading ui and set the values in the snapshot
     Works only when the fetching process is NOT running"""
     game_state = agent.snapshot
@@ -59,7 +59,7 @@ def game_state_update_snapshot(agent: BaseTrainingAgent, data_vars: InterfaceVar
 
 
 @DeprecationWarning
-def game_state_update_ui(agent: BaseTrainingAgent, data_vars: InterfaceVariables):
+def game_state_update_ui(agent: BaseTrainingEnvironment, data_vars: InterfaceVariables):
     """Setting the UI to the current known snapshot"""
 
     if agent:

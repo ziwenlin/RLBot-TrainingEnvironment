@@ -19,7 +19,7 @@ def generate_physics(seed, value):
     )
 
 
-class Test(TestCase):
+class TestSnapshot(TestCase):
     def test_snapshot_update_ball(self):
         physics = generate_physics(10, 300)
         game_state = GameTickPacket(

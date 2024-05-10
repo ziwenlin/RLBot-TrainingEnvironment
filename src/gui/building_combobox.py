@@ -1,13 +1,13 @@
 from gui.building_blocks import make_spaced_label
 from gui.gui_base import InterfaceVariables
-from util.agent_base import BaseTrainingAgent
+from util.agent_base import BaseTrainingEnvironment
 import tkinter.ttk as ttk
 
 
 # TODO add comments to the whole file
 
 
-def make_combobox(root, agent: BaseTrainingAgent, interface: InterfaceVariables, selector):
+def make_combobox(root, agent: BaseTrainingEnvironment, interface: InterfaceVariables, selector):
     make_spaced_label(root, 'Selected item:')
     combobox = ttk.Combobox(root)
     combobox.pack()
@@ -26,7 +26,7 @@ def make_combobox(root, agent: BaseTrainingAgent, interface: InterfaceVariables,
     interface.thread.add_task(update, name='Combobox')
 
 
-def build_combobox_select_update(combobox: ttk.Combobox, agent: BaseTrainingAgent, interface: InterfaceVariables,
+def build_combobox_select_update(combobox: ttk.Combobox, agent: BaseTrainingEnvironment, interface: InterfaceVariables,
                                  selector):
     def combobox_select_update():
         physics = interface.selector.get(selector)
@@ -47,7 +47,7 @@ def build_combobox_select_update(combobox: ttk.Combobox, agent: BaseTrainingAgen
     return combobox_select_update
 
 
-def build_combobox_values_update(combobox: ttk.Combobox, agent: BaseTrainingAgent):
+def build_combobox_values_update(combobox: ttk.Combobox, agent: BaseTrainingEnvironment):
     def combobox_update_values():
         values = ['None', 'Ball']
         for i in agent.snapshot.cars:
@@ -59,7 +59,7 @@ def build_combobox_values_update(combobox: ttk.Combobox, agent: BaseTrainingAgen
     return combobox_update_values
 
 
-def build_combobox_select_event(combobox: ttk.Combobox, agent: BaseTrainingAgent, interface: InterfaceVariables,
+def build_combobox_select_event(combobox: ttk.Combobox, agent: BaseTrainingEnvironment, interface: InterfaceVariables,
                                 selector):
     def combobox_select_item(event):
         selected_item: str = combobox.get()
